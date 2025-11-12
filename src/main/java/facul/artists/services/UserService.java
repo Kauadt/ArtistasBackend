@@ -4,38 +4,46 @@ import facul.artists.models.User;
 import facul.artists.repositories.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
 public class UserService {
     private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    public User crateUser(User user) {
+ public User createUser(User user) {
+        String senhaCriptografada = passwordEncoder.encode(user.getPassword());
+        user.setPassword(senhaCriptografada);
+        
         return userRepository.save(user);
     }
 
-    public User getdByID(Long id){
-        return userRepository.getReferenceById(id);
+    public Optional<User> getByID(Long id) {
+        return userRepository.findById(id);
     }
 
-    public User updateUser(Long id,User user) {
-        User userAtualizado = getdByID(id);
-
+    public User updateUser(Long id, User user) {
+        User userAtualizado = getByID(id).orElseThrow(() -> new RuntimeException("User not found"));
         userAtualizado.setNome(user.getNome());
         userAtualizado.setEmail(user.getEmail());
-        userAtualizado.setPassword(user.getPassword());
 
         return userRepository.save(userAtualizado);
     }
 
-    public void deleteUser(Long id){
-        User user =  getdByID(id);
+    public void deleteUser(Long id) {
+        User user = getByID(id).orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.delete(user);
     }
 }
