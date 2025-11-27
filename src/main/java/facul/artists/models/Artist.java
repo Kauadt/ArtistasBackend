@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,28 +13,21 @@ import java.time.LocalDateTime;
 public class Artist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "artist_id")
+    private Long artistId;
 
     @Column(nullable = false)
-    private String name;
-
     private String artistEmail;
 
+    @Column(nullable = false)
     private String phone;
 
+    @Column(nullable = false)
     private String city;
-
-    //private Blob ProfilePic;
 
     private String biography;
 
-    private LocalDateTime createdAt;
-
-    private String instagram;
-
-    private Double avaregeRating;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @JoinColumn(name = "id", unique = true, nullable = false)
     private User user;
 }
